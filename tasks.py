@@ -15,7 +15,12 @@ def list_tasks():
         print("Задач нет")
         return
     for i, task in enumerate(tasks, 1):
-        status = "[x]" if task["done"] else "[ ]"
+        if task["done"] == "postponed":
+            status = "[~]"
+        elif task["done"]:
+            status = "[x]"
+        else:
+            status = "[ ]"
         print(f"{i}. {status} {task['title']}")
 
 
@@ -30,3 +35,10 @@ def delete_task(index):
     if 0 < index <= len(tasks):
         removed = tasks.pop(index - 1)
         print(f"Задача удалена: {removed['title']}")
+
+
+def postpone_task(index):
+    """Отложить задачу по индексу (помечает как [~])."""
+    if 0 < index <= len(tasks):
+        tasks[index - 1]["done"] = "postponed"
+        print(f"Задача отложена: {tasks[index - 1]['title']}")
