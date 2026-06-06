@@ -18,7 +18,15 @@ def list_tasks():
         status = "[x]" if task["done"] else "[ ]"
         print(f"{i}. {status} {task['title']}")
 
+
 def complete_task(index):
     """Пометить задачу с индексом index как выполненную."""
     if 0 < index <= len(tasks):
         tasks[index - 1]["done"] = True
+
+
+def delete_task(index):
+    """Удалить задачу по индексу."""
+    if 0 < index <= len(tasks):
+        removed = tasks.pop(index - 1)
+        print(f"Задача удалена: {removed['title']}")
