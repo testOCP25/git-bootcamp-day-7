@@ -1,6 +1,20 @@
-# LAB — день 7
+# Содержание
+- [Содержание](#содержание)
+- [LAB — день 7](#lab--день-7)
+  - [Базовая задача — `01-platforms-tour`](#базовая-задача--01-platforms-tour)
+    - [Ссылки на репозитории](#ссылки-на-репозитории)
+    - [GitLab — скриншоты (3)](#gitlab--скриншоты-3)
+    - [GitFlic — скриншоты (3)](#gitflic--скриншоты-3)
+    - [GitVerse — скриншоты (3)](#gitverse--скриншоты-3)
+    - [Таблица сравнения платформ](#таблица-сравнения-платформ)
+    - [Команды](#команды)
+    - [Впечатления (2–3 предложения)](#впечатления-23-предложения)
+  - [⭐1 — bare headless](#1--bare-headless)
+  - [⭐2 — Gitea](#2--gitea)
+  - [⭐3 — GitLab CE self-hosted](#3--gitlab-ce-self-hosted)
 
-> Скопируйте в `LAB.md` в корне `git-bootcamp-day-7` на **GitHub** и заполните по ходу работы.
+
+# LAB — день 7
 
 ## Базовая задача — `01-platforms-tour`
 
@@ -8,10 +22,10 @@
 
 | Платформа | URL |
 |-----------|-----|
-| GitHub (основной) | [FIXME: https://github.com/.../git-bootcamp-day-7] |
-| GitLab | [FIXME] |
-| GitFlic | [FIXME] |
-| GitVerse | [FIXME] |
+| GitHub (основной) | https://github.com/testOCP25/git-bootcamp-day-7 |
+| GitLab | https://gitlab.com/testOCP25/git-bootcamp-day-7 |
+| GitFlic | https://gitflic.ru/project/rogger/git-bootcamp-day-7 |
+| GitVerse | https://gitverse.ru/rogger/git-bootcamp-day-7 |
 
 ### GitLab — скриншоты (3)
 
@@ -59,14 +73,16 @@
 
 | Возможность | GitHub | GitLab | GitFlic | GitVerse |
 |-------------|--------|--------|---------|----------|
-| SSH-ключ через UI | да | [FIXME] | [FIXME] | [FIXME] |
-| Markdown render в README | да | [FIXME] | [FIXME] | [FIXME] |
-| Issues встроены | да | [FIXME] | [FIXME] | [FIXME] |
-| PR / Merge Request | PR | [FIXME] | [FIXME] | [FIXME] |
-| Встроенный CI | Actions | [FIXME] | [FIXME] | [FIXME] |
-| Релизы / теги в UI | да | [FIXME] | [FIXME] | [FIXME] |
-| Видимость для незалогиненных | да | [FIXME] | [FIXME] | [FIXME] |
-| Что-то особенное | [FIXME] | [FIXME] | [FIXME] | [FIXME] |
+| SSH-ключ через UI | да | да | да | да |
+| Markdown render в README | да | да | да | да |
+| Issues встроены | да | да | да | да |
+| PR / Merge Request | PR | MR | MR | MR |
+| Встроенный CI | Actions | GitLab CI/CD | есть, встроенный CI/CD | GitVerse Actions (CI/CD)  |
+| Релизы / теги в UI | да | да | да | да |
+| Видимость для незалогиненных | да | да | да | да |
+| Что-то особенное | Copilot, Actions, огромное сообщество | единая DevOps-платформа (All-in-One) | SAST/DAST/SCA, реестр пакетов, российская юрисдикция | GigaCode (ИИ-ассистент), GigaIDE (облачная среда) |
+
+
 
 ### Команды
 
@@ -78,11 +94,26 @@
 # ssh -T git@gitlab.com
 # ssh -T git@gitflic.ru
 # ssh -T git@gitverse.ru
+
+git remote add gitlab git@gitlab.com:testOCP25/git-bootcamp-day-7.git
+git remote add gitflic git@gitflic.ru:rogger/git-bootcamp-day-7.git
+git remote add gitverse git@gitverse.ru:rogger/git-bootcamp-day-7.git
+
+git push gitlab  --tags
+git push gitlab  --all
+git push gitflic --all
+git push gitflic --tags
+git push gitverse --all
+git push gitverse --tags
+
+ssh -T git@gitlab.com
+ssh -T git@gitflic.ru
+ssh -T git@gitverse.ru
 ```
 
 ### Впечатления (2–3 предложения)
 
-[FIXME: что удивило или было неудобно на GitLab / GitFlic / GitVerse]
+Удвило, что у нас есть несколько проектов, которые похожи на Git. На любой вкус и цвет) Но при этом странно, что забыли https://sourcecraft.dev/. Я его себе тоже добавил, проверил, работает нормально. Понятно, что для того, чтобы нормально осознать плюсы и минусы каждой платформы, надо какое-то время поработать с каждой.
 
 ---
 
@@ -90,7 +121,33 @@
 
 **Где bare на VM и URL remote `vm`:**
 
-[FIXME: /srv/git/myrepo.git, git@192.168.56.10:...]
+Для задачки пришлось поковыряться - в дефолтной конгфиге заводиться не захотел, сначала поменял образ, но это не помогло, в итоге остановился на влкючении GUI (подвисал на создании ключей) и выделении 1Гб памяти.
+
+**Файл vagrant:**
+```text
+#ENV['VAGRANT_SERVER_URL'] = 'https://vagrant.elab.pro'
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-24.04"
+  config.vm.box_version = "202510.26.0" # add
+#  config.vm.box = "net9/ubuntu-24.04-arm64"
+  config.vm.box_check_update = false
+  config.vm.hostname = "bare-git-host"
+
+  config.vm.network "private_network", ip: "192.168.56.10"
+
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "git-bootcamp-bare"
+    vb.memory = "1024"     # change
+    vb.cpus = 1
+    vb.gui = true          # change
+  end
+
+  config.vm.provision "shell", path: "provision.sh"
+end
+```
 
 ![push в bare](screenshots/star1-push.png)
 
@@ -100,9 +157,7 @@
 
 ## ⭐2 — Gitea
 
-**Чем UI Gitea отличается от GitHub (1 абзац):**
-
-[FIXME]
+GitLab — тяжёлая DevOps-платформа «всё в одном», требующая много ресурсов, но предлагающая встроенный CI/CD, Container Registry, сканирование безопасности и мониторинг. Gitea — легковесный аналог на Go, работающий даже на Raspberry Pi, предоставляющий базовый набор (репозитории, Issues, PR, Actions), но без тяжёлых встроенных инструментов DevOps. Выбирайте GitLab для больших команд с потребностью в единой платформе, а Gitea — для небольших проектов, хобби или когда ресурсы сервера сильно ограничены.
 
 ![Gitea repository](screenshots/star2-gitea-repo.png)
 
