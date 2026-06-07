@@ -168,9 +168,40 @@ GitLab — тяжёлая DevOps-платформа «всё в одном», т
 ## ⭐3 — GitLab CE self-hosted
 
 **GitLab CE vs Gitea: RAM, время старта (2–3 предложения):**
+Снова пришлось покурочить, чтобы завелось, в итоге увелчил RAM, выбрал другой образ:
 
-[FIXME]
+**Файл docker-compose.yaml**
+```text
+services:
+  gitlab:
+    #image: gitlab/gitlab-ce:16.11.10-ce.0
+    #platform: linux/arm64
+    image: zengxs/gitlab:ee-arm64     # перебором остановился на этом
+    container_name: gitlab
+    hostname: gitlab.local
+    restart: unless-stopped
+    shm_size: "256m"
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://192.168.56.11:8080'
+        gitlab_rails['gitlab_shell_ssh_port'] = 2222
+        nginx['listen_port'] = 80
+    ports:
+      - "8080:80"
+      - "2222:22"
+    volumes:
+      - gitlab-config:/etc/gitlab
+      - gitlab-logs:/var/log/gitlab
+      - gitlab-data:/var/opt/gitlab
+
+volumes:
+  gitlab-config:
+  gitlab-logs:
+  gitlab-data:
+```
 
 ![GitLab project](screenshots/star3-gitlab-project.png)
 
 ![GitLab merge request](screenshots/star3-gitlab-mr.png)
+
+![GitLab complete merge request](screenshots/star3-gitlab-complete-mr.png)
